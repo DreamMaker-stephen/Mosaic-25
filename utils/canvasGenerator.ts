@@ -1,12 +1,14 @@
-import { GridItem, GRID_COLS, GridConfig } from '../types';
+import { GridItem, GridConfig } from '../types';
 
 /**
- * Draws the 5x5 grid onto a canvas and returns the Data URL.
+ * Draws the grid onto a canvas and returns the Data URL.
  * Implements "object-fit: cover" logic manually for canvas drawing.
+ * Supports variable column count (defaults to 5).
  */
 export const generateGridImage = async (
   items: GridItem[],
-  config: GridConfig
+  config: GridConfig,
+  cols: number = 5
 ): Promise<string> => {
   const canvas = document.createElement('canvas');
   const size = config.exportSize;
@@ -26,17 +28,9 @@ export const generateGridImage = async (
   ctx.fillRect(0, 0, size, size);
 
   // Calculate individual slot size
-  // Total width = 5 * slotWidth + 4 * gap
-  // slotWidth = (Total width - 4 * gap) / 5
-  // However, usually "gap" is handled by shrinking items or spacing them.
-  // Let's assume the gap is internal spacing.
-  
-  // Effective space for cells excluding outer padding (if any, assuming 0 here)
-  // We need to account that there are GRID_COLS items, and (GRID_COLS - 1) gaps between them.
-  // Actually, easier logic:
   // cellSize = (totalSize - (gaps * (cols - 1))) / cols
-  const totalGapSpace = gap * (GRID_COLS - 1);
-  const cellSize = (size - totalGapSpace) / GRID_COLS;
+  const totalGapSpace = gap * (cols - 1);
+  const cellSize = (size - totalGapSpace) / cols;
 
   const loadImage = (url: string): Promise<HTMLImageElement> => {
     return new Promise((resolve, reject) => {
@@ -52,8 +46,8 @@ export const generateGridImage = async (
     const item = items[i];
     if (!item.previewUrl) continue;
 
-    const col = i % GRID_COLS;
-    const row = Math.floor(i / GRID_COLS);
+    const col = i % cols;
+    const row = Math.floor(i / cols);
 
     const x = col * (cellSize + gap);
     const y = row * (cellSize + gap);

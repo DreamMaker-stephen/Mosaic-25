@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Grid as GridIcon, Image as ImageIcon } from 'lucide-react';
-import { GridItem, GridConfig, TOTAL_SLOTS, GRID_COLS } from '../types';
+import { Image as ImageIcon } from 'lucide-react';
+import { GridItem, GridConfig, TOTAL_SLOTS } from '../types';
 import GridSlot from './GridSlot';
 import ControlPanel from './ControlPanel';
 import { generateGridImage, downloadImage } from '../utils/canvasGenerator';
@@ -17,7 +17,11 @@ const initialConfig: GridConfig = {
   exportSize: 2000,
 };
 
-const PackMode: React.FC = () => {
+interface PackModeProps {
+  onUsed?: () => void;
+}
+
+const PackMode: React.FC<PackModeProps> = ({ onUsed }) => {
   const [items, setItems] = useState<GridItem[]>(initialItems);
   const [config, setConfig] = useState<GridConfig>(initialConfig);
   const [isExporting, setIsExporting] = useState(false);
@@ -92,9 +96,10 @@ const PackMode: React.FC = () => {
     setIsExporting(true);
     setTimeout(async () => {
       try {
-        const dataUrl = await generateGridImage(items, config);
+        const dataUrl = await generateGridImage(items, config, 5);
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         downloadImage(dataUrl, `mosaic-25-pack-${timestamp}.png`);
+        onUsed?.();
       } catch (error) {
         console.error("Export failed", error);
         alert("导出失败，请重试。\nFailed to generate image. Please try again.");
@@ -102,7 +107,7 @@ const PackMode: React.FC = () => {
         setIsExporting(false);
       }
     }, 100);
-  }, [items, config]);
+  }, [items, config, onUsed]);
 
   const filledCount = items.filter(i => i.previewUrl !== null).length;
 
