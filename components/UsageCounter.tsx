@@ -5,43 +5,37 @@ const UsageCounter: React.FC = () => {
   const [displayCount, setDisplayCount] = useState(0);
 
   useEffect(() => {
-    // 使用 visits 服务 - 更稳定
-    fetch('https://visits.moeqq.com/api/dreammaker-stephen.github.io@mosaic-25')
+    // 方案1: CountAPI (最常用)
+    fetch('https://api.countapi.xyz/hit/dreammaker-stephen-github-io/mosaic-25')
       .then(res => res.json())
       .then(data => {
-        const count = data.count || 0;
-        animateCount(count);
+        if (data.value) animateCount(data.value);
+        else throw new Error('No data');
       })
       .catch(() => {
-        // 备用方案：使用 visitor-badge
-        fetch('https://api.visitorbadge.io/api/visitors?path=dreammaker-stephen.github.io/mosaic-25&label=&labelColor=%230d1117&countColor=%230d1117&style=flat')
+        // 方案2: 使用 visitor-badge API
+        return fetch('https://api.visitorbadge.io/api/visitors?path=dreammaker-stephen.github.io/mosaic-25&label=&labelColor=%230d1117&countColor=%230d1117&style=flat')
           .then(res => res.text())
           .then(text => {
             const match = text.match(/>([\d,]+)</);
             const count = match ? parseInt(match[1].replace(/,/g, '')) : 0;
             animateCount(count);
-          })
-          .catch(() => setDisplayCount(0));
-      });
+          });
+      })
+      .catch(() => setDisplayCount(0));
 
     function animateCount(count: number) {
       const duration = 1500;
       const startTime = performance.now();
-
       const animate = (currentTime: number) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const ease = 1 - Math.pow(1 - progress, 4);
         const current = Math.floor(count * ease);
         setDisplayCount(current);
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          setDisplayCount(count);
-        }
+        if (progress < 1) requestAnimationFrame(animate);
+        else setDisplayCount(count);
       };
-
       requestAnimationFrame(animate);
     }
   }, []);
