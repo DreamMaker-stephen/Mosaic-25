@@ -16,10 +16,6 @@ Mosaic-25 是一个9/25 宫格图片拆分与打包工具。它可以帮助用�
 
 ## 🛠️ 本地开发指南
 
-### 前置条件
-- 已安装 [Node.js](https://nodejs.org/) (推荐 LTS 版本)
-- 拥有一个 [Google Gemini API Key](https://aistudio.google.com/app/apikey)
-
 ### 安装步骤
 
 1. **克隆仓库**
