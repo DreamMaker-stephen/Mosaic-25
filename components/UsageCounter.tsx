@@ -9,7 +9,7 @@ const UsageCounter: React.FC = () => {
     // 使用 Moe-Counter 图片服务
     // 通过图片 URL 获取计数，无 CORS 问题
     const img = new Image();
-    const counterUrl = 'https://count.getloli.com/get/@zaomengshi-mosaic-25?theme=rule34';
+    const counterUrl = 'https://count.getloli.com/get/@zaomengshi-mosaic-25?theme=moebooru';
 
     img.onload = () => {
       setImageLoaded(true);
@@ -103,7 +103,7 @@ const UsageCounter: React.FC = () => {
           <div className="flex items-center gap-2">
             {/* Moe-Counter 图片 */}
             <img
-              src="https://count.getloli.com/get/@zaomengshi-mosaic-25?theme=rule34"
+              src="https://count.getloli.com/get/@zaomengshi-mosaic-25?theme=moebooru"
               alt="visit count"
               data-moe-counter
               className="h-6 object-contain"
