@@ -1,69 +1,55 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Eye } from 'lucide-react';
 
 const UsageCounter: React.FC = () => {
-  const [count, setCount] = useState(0);
   const [displayCount, setDisplayCount] = useState(0);
-  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
-    // 从本地存储获取上次访问数
-    const stored = localStorage.getItem('visit_count');
-    let currentCount = stored ? parseInt(stored) : 0;
+    // 使用 CountAPI - 需要正确的 namespace（不支持点号）
+    fetch('https://api.countapi.xyz/hit/zaomengshi-cn/mosaic-25')
+      .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
+      .then(data => {
+        if (data.value) {
+          animateCount(data.value);
+        } else {
+          throw new Error('No data');
+        }
+      })
+      .catch(err => {
+        console.log('CountAPI error:', err);
+        // 出错时尝试获取当前值（不增加）
+        fetch('https://api.countapi.xyz/get/zaomengshi-cn/mosaic-25')
+          .then(res => res.json())
+          .then(data => {
+            if (data.value) animateCount(data.value);
+          })
+          .catch(() => setDisplayCount(0));
+      });
 
-    // 检查是否是今天第一次访问
-    const lastVisit = localStorage.getItem('last_visit_date');
-    const today = new Date().toDateString();
+    function animateCount(count: number) {
+      const duration = 1500;
+      const startTime = performance.now();
 
-    if (lastVisit !== today) {
-      // 新的一天，计数+1
-      currentCount += 1;
-      localStorage.setItem('visit_count', currentCount.toString());
-      localStorage.setItem('last_visit_date', today);
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 4);
+        const current = Math.floor(count * ease);
+        setDisplayCount(current);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setDisplayCount(count);
+        }
+      };
+
+      requestAnimationFrame(animate);
     }
-
-    // 动画显示
-    animateCount(currentCount);
-
-    // 尝试从 hits.sh 获取真实访问数（通过图片加载）
-    // 由于 CORS 限制，我们只能显示图片，无法读取数字
-    // 所以本地计数作为备用显示
   }, []);
-
-  // 监听 hits.sh 图片加载
-  useEffect(() => {
-    const img = imgRef.current;
-    if (!img) return;
-
-    const handleLoad = () => {
-      // 图片加载成功，但无法读取数字（CORS）
-      // 保持本地计数显示
-    };
-
-    img.addEventListener('load', handleLoad);
-    return () => img.removeEventListener('load', handleLoad);
-  }, []);
-
-  function animateCount(targetCount: number) {
-    const duration = 1500;
-    const startTime = performance.now();
-
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 4);
-      const current = Math.floor(targetCount * ease);
-      setDisplayCount(current);
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setDisplayCount(targetCount);
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-4 duration-700 pointer-events-none">
@@ -80,14 +66,6 @@ const UsageCounter: React.FC = () => {
             {displayCount.toLocaleString()}
           </span>
         </div>
-        {/* 隐藏的 hits.sh 图片用于统计（虽然 CORS 阻止我们读取，但可以记录访问） */}
-        <img
-          ref={imgRef}
-          src="https://hits.sh/www.zaomengshi.cn/.svg?style=flat-square&label=Views&color=007ec6&labelColor=555555"
-          alt=""
-          className="hidden"
-          crossOrigin="anonymous"
-        />
       </div>
     </div>
   );
