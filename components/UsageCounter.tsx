@@ -5,22 +5,25 @@ const UsageCounter: React.FC = () => {
   const [displayCount, setDisplayCount] = useState(0);
 
   useEffect(() => {
-    // 方案1: CountAPI (最常用)
-    fetch('https://api.countapi.xyz/hit/dreammaker-stephen-github-io/mosaic-25')
-      .then(res => res.json())
-      .then(data => {
-        if (data.value) animateCount(data.value);
-        else throw new Error('No data');
-      })
-      .catch(() => {
-        // 方案2: 使用 visitor-badge API
-        return fetch('https://api.visitorbadge.io/api/visitors?path=dreammaker-stephen.github.io/mosaic-25&label=&labelColor=%230d1117&countColor=%230d1117&style=flat')
-          .then(res => res.text())
-          .then(text => {
-            const match = text.match(/>([\d,]+)</);
-            const count = match ? parseInt(match[1].replace(/,/g, '')) : 0;
-            animateCount(count);
-          });
+    // 使用 hits.sh - 国内访问更稳定
+    fetch('https://hits.sh/www.zaomengshi.cn/.svg')
+      .then(res => res.text())
+      .then(text => {
+        // 从 SVG 中提取数字
+        const match = text.match(/>(\d+)</);
+        const count = match ? parseInt(match[1]) : 0;
+        if (count > 0) {
+          animateCount(count);
+        } else {
+          // 备用：visitor-badge
+          return fetch('https://api.visitorbadge.io/api/visitors?path=www.zaomengshi.cn&label=&labelColor=%230d1117&countColor=%230d1117&style=flat')
+            .then(res => res.text())
+            .then(text2 => {
+              const match2 = text2.match(/>([\d,]+)</);
+              const count2 = match2 ? parseInt(match2[1].replace(/,/g, '')) : 0;
+              animateCount(count2);
+            });
+        }
       })
       .catch(() => setDisplayCount(0));
 
