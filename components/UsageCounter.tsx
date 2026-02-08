@@ -99,7 +99,7 @@ const UsageCounter: React.FC = () => {
 
         {/* 计数器图片 */}
         <img
-          src="https://count.getloli.com/get/@zaomengshi-mosaic-25?theme=moebooru&length=6"
+          src="https://count.getloli.com/get/@zaomengshi-mosaic-25?theme=asoul&length=6"
           alt="visit count"
           data-moe-counter
           className="h-5 object-contain"
