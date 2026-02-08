@@ -1,0 +1,5 @@
+{
+  "name": "Mosaic 25 - Grid Generator",
+  "description": "专业的25宫格/9宫格生成器。自动裁剪，支持批量上传、拆分和打包下载。 Professional 25-grid/9-grid generator. Auto-crop, batch upload, split and pack support.",
+  "requestFramePermissions": []
+}
