@@ -3,40 +3,47 @@ import { Eye } from 'lucide-react';
 
 const UsageCounter: React.FC = () => {
   const [displayCount, setDisplayCount] = useState(0);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch real visit count from CountAPI
   useEffect(() => {
-    fetch('https://api.countapi.xyz/hit/dreammaker-stephen.github.io/mosaic-25')
+    // 使用 visits 服务 - 更稳定
+    fetch('https://visits.moeqq.com/api/dreammaker-stephen.github.io@mosaic-25')
       .then(res => res.json())
       .then(data => {
-        const count = data.value;
-        setLoading(false);
-
-        // Animate from 0 to actual count
-        const duration = 1500;
-        const startTime = performance.now();
-
-        const animate = (currentTime: number) => {
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const ease = 1 - Math.pow(1 - progress, 4);
-          const current = Math.floor(count * ease);
-          setDisplayCount(current);
-
-          if (progress < 1) {
-            requestAnimationFrame(animate);
-          } else {
-            setDisplayCount(count);
-          }
-        };
-
-        requestAnimationFrame(animate);
+        const count = data.count || 0;
+        animateCount(count);
       })
       .catch(() => {
-        setLoading(false);
-        setDisplayCount(0);
+        // 备用方案：使用 visitor-badge
+        fetch('https://api.visitorbadge.io/api/visitors?path=dreammaker-stephen.github.io/mosaic-25&label=&labelColor=%230d1117&countColor=%230d1117&style=flat')
+          .then(res => res.text())
+          .then(text => {
+            const match = text.match(/>([\d,]+)</);
+            const count = match ? parseInt(match[1].replace(/,/g, '')) : 0;
+            animateCount(count);
+          })
+          .catch(() => setDisplayCount(0));
       });
+
+    function animateCount(count: number) {
+      const duration = 1500;
+      const startTime = performance.now();
+
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 4);
+        const current = Math.floor(count * ease);
+        setDisplayCount(current);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setDisplayCount(count);
+        }
+      };
+
+      requestAnimationFrame(animate);
+    }
   }, []);
 
   return (
