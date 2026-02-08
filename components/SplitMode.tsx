@@ -1,11 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, Scissors, Download, RefreshCw, LayoutGrid } from 'lucide-react';
-import { GridItem, GridSplitSize } from '../types';
+import { UploadCloud, Scissors, Download, RefreshCw, LayoutGrid, Merge } from 'lucide-react';
+import { GridItem, GridSplitSize, GridConfig } from '../types';
 import { splitImage, downloadZip } from '../utils/imageHelper';
+import { generateGridImage, downloadImage } from '../utils/canvasGenerator';
 import GridSlot from './GridSlot';
-import { downloadImage } from '../utils/canvasGenerator';
 
-const SplitMode: React.FC = () => {
+interface SplitModeProps {
+  onUsed?: () => void;
+}
+
+const SplitMode: React.FC<SplitModeProps> = ({ onUsed }) => {
   const [gridSize, setGridSize] = useState<GridSplitSize>(5);
   const [items, setItems] = useState<GridItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -68,9 +72,35 @@ const SplitMode: React.FC = () => {
     try {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         await downloadZip(items.map(i => i.previewUrl), `mosaic-${gridSize}x${gridSize}-split-${timestamp}.zip`);
+        onUsed?.();
     } catch (e) {
         console.error(e);
         alert("打包失败 / Failed to zip images");
+    } finally {
+        setIsProcessing(false);
+    }
+  };
+  
+  const handleMergeDownload = async () => {
+    if (items.length === 0) return;
+    setIsProcessing(true);
+    
+    try {
+        // Create a config for the merge
+        // We assume 0 gap to reconstruct the image perfectly
+        const config: GridConfig = {
+            gap: 0,
+            backgroundColor: '#ffffff',
+            exportSize: 3000 // High resolution export
+        };
+        
+        const dataUrl = await generateGridImage(items, config, gridSize);
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        downloadImage(dataUrl, `mosaic-${gridSize}x${gridSize}-merged-${timestamp}.png`);
+        onUsed?.();
+    } catch (e) {
+        console.error(e);
+        alert("合并失败 / Failed to merge images");
     } finally {
         setIsProcessing(false);
     }
@@ -178,30 +208,47 @@ const SplitMode: React.FC = () => {
                             </span>
                          </div>
 
-                        <button
-                            onClick={handleDownloadAll}
-                            disabled={isProcessing}
-                            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg flex items-center justify-center gap-2 font-semibold transition-all shadow-lg"
-                        >
-                            {isProcessing ? (
-                                <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
-                            ) : (
-                                <Download size={20} />
-                            )}
-                            <span>打包下载 / Download ZIP</span>
-                        </button>
+                        <div>
+                            <button
+                                onClick={handleDownloadAll}
+                                disabled={isProcessing}
+                                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg flex items-center justify-center gap-2 font-semibold transition-all shadow-lg"
+                            >
+                                {isProcessing ? (
+                                    <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
+                                ) : (
+                                    <Download size={20} />
+                                )}
+                                <span>拆分后下载 / Split&Download</span>
+                            </button>
+                            <p className="text-xs text-slate-500 text-center mt-2 px-1">
+                                将图片拆分为{gridSize * gridSize}等分后下载
+                            </p>
+                        </div>
+                        
+                        <div className="pt-2">
+                            <button
+                                onClick={handleMergeDownload}
+                                disabled={isProcessing}
+                                className="w-full py-3 px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center justify-center gap-2 font-medium transition-colors border border-slate-600"
+                            >
+                                <Merge size={20} />
+                                <span>替换后下载 / Merge&Download </span>
+                            </button>
+                            <p className="text-xs text-slate-500 text-center mt-2 px-1">
+                                替换掉某几个镜头，重新合并为一张图片
+                            </p>
+                        </div>
+
+                        <div className="h-px bg-slate-700 my-2"></div>
 
                         <button
                             onClick={handleReset}
-                            className="w-full py-3 px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
+                            className="w-full py-3 px-4 bg-transparent hover:bg-red-900/20 text-red-400 hover:text-red-300 rounded-lg flex items-center justify-center gap-2 transition-colors"
                         >
                             <RefreshCw size={18} />
                             <span>重新拆分 / Reset</span>
                         </button>
-                    </div>
-
-                    <div className="mt-6 pt-6 border-t border-slate-700 text-xs text-slate-500">
-                        <p>提示：下载前，您可以点击生成的方格替换其中的图片。<br/>Tips: You can click tiles to replace them before downloading.</p>
                     </div>
                 </div>
             </div>
