@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Eye } from 'lucide-react';
 
 const UsageCounter: React.FC = () => {
   const [displayCount, setDisplayCount] = useState(0);
@@ -91,37 +90,38 @@ const UsageCounter: React.FC = () => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-4 duration-700 pointer-events-none">
-      <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-800/40 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/20 group hover:bg-slate-800/60 transition-all pointer-events-auto">
-        <div className="relative">
-          <div className="absolute inset-0 bg-blue-500 blur-sm opacity-20 group-hover:opacity-40 transition-opacity rounded-full"></div>
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-2 rounded-full relative z-10">
-             <Eye size={16} className="text-white" />
-          </div>
-        </div>
-        <div className="flex flex-col">
-          <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Total Visits / 累计访问</span>
-          <div className="flex items-center gap-2">
-            {/* Moe-Counter 图片 */}
-            <img
-              src="https://count.getloli.com/get/@zaomengshi-mosaic-25?theme=moebooru"
-              alt="visit count"
-              data-moe-counter
-              className="h-6 object-contain"
-              onError={(e) => {
-                // 图片加载失败时显示数字
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-            {/* 备用数字显示 */}
-            <span
-              id="visit-counter"
-              className="text-lg font-bold text-white font-mono leading-none tracking-tight"
-              style={{ display: 'none' }}
-            >
-              {displayCount.toLocaleString()}
-            </span>
-          </div>
-        </div>
+      <div className="inline-flex items-center gap-3 px-4 py-2 bg-black/80 rounded-lg border border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.15)] backdrop-blur-sm pointer-events-auto hover:border-green-500/50 transition-all">
+        {/* 脉冲绿点 */}
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+        </span>
+
+        {/* 计数器图片 */}
+        <img
+          src="https://count.getloli.com/get/@zaomengshi-mosaic-25?theme=moebooru&length=6"
+          alt="visit count"
+          data-moe-counter
+          className="h-5 object-contain"
+          style={{
+            filter: 'drop-shadow(0 0 3px rgba(34, 197, 94, 0.5))',
+            imageRendering: 'pixelated'
+          }}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            const backup = document.getElementById('visit-counter');
+            if (backup) backup.style.display = 'block';
+          }}
+        />
+
+        {/* 备用数字显示 */}
+        <span
+          id="visit-counter"
+          className="text-sm font-bold text-green-400 font-mono leading-none tracking-tight hidden"
+          style={{ textShadow: '0 0 10px rgba(34, 197, 94, 0.5)' }}
+        >
+          {displayCount.toLocaleString()}
+        </span>
       </div>
     </div>
   );
