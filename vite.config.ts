@@ -1,14 +1,15 @@
 import path from 'path';
+import fs from 'fs';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
-    // 根据部署环境设置base路径：
-    // - GitHub Pages: /Mosaic-25/ （子目录）
-    // - 自定义域名: / （根目录）
-    const isGitHubPages = !process.env.CUSTOM_DOMAIN;
-    const base = isGitHubPages ? '/Mosaic-25/' : '/';
+    
+    // 检查是否有CNAME文件（自定义域名）
+    const hasCNAME = fs.existsSync(path.join(__dirname, 'public/CNAME')) || 
+                     fs.existsSync(path.join(__dirname, 'CNAME'));
+    const base = hasCNAME ? '/' : '/Mosaic-25/';
     
     return {
       base,
@@ -33,7 +34,9 @@ export default defineConfig(({ mode }) => {
             chunkFileNames: 'assets/[name].[hash].js',
             assetFileNames: 'assets/[name].[hash][extname]'
           }
-        }
+        },
+        assetsDir: 'assets',
+        assetsInlineLimit: 4096,
       }
     };
 });

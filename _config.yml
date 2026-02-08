@@ -1,0 +1,3 @@
+jekyll_path: "/dev/null"
+exclude: ["node_modules", "package.json", "package-lock.json", "vite.config.ts", "tsconfig.json", "postcss.config.js", "tailwind.config.js"]
+keep_files: ["assets", ".nojekyll", "CNAME"]
