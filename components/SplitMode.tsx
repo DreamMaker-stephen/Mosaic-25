@@ -236,7 +236,7 @@ const SplitMode: React.FC<SplitModeProps> = ({ onUsed }) => {
                                 <span>替换后下载 / Merge&Download </span>
                             </button>
                             <p className="text-xs text-slate-500 text-center mt-2 px-1">
-                                替换掉某几个镜头，重新合并为一张图片
+                                替换掉某几张图片，合并成一张图片后下载
                             </p>
                         </div>
 
