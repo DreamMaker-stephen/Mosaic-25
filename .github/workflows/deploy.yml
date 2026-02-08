@@ -32,8 +32,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: GITHUB_PAGES=true npm run build
+      - name: Check if using custom domain
+        id: check_domain
+        run: |
+          if [ -f "public/CNAME" ] || [ -f "CNAME" ]; then
+            echo "use_custom_domain=true" >> $GITHUB_OUTPUT
+          else
+            echo "use_custom_domain=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build with custom domain
+        if: steps.check_domain.outputs.use_custom_domain == 'true'
+        run: CUSTOM_DOMAIN=true npm run build
+
+      - name: Build for GitHub Pages
+        if: steps.check_domain.outputs.use_custom_domain == 'false'
+        run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
