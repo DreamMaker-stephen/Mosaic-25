@@ -1,2 +1,23 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	html, body, #root {
+		height: 100%;
+	}
+	body {
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		background-color: #0f172a;
+		color: #e6eef8;
+	}
+}
+
+/* small custom helpers */
+.container-max {
+	max-width: 1120px;
+	margin-left: auto;
+	margin-right: auto;
+}
 
