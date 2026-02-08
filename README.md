@@ -6,8 +6,7 @@ Mosaic-25 是一个驱9/25 宫格图片拆分与打包工具。它可以帮助�
 
 需求背景：即梦新出的seedance2.0模型，可以生成九宫格二十五宫，部分玩家需求替换其中的某一个镜头后，重新打包上传，所以做了个小应用。可以将一张图 分拆出25张图，也可以直接在当前页面替换掉某一个镜头后重新合并成一张图。
 
-
-![项目封面](https://www.zaomengshi.cn/favicon.ico) 
+可以访问www.zaomengshi.cn进行快速体验，项目是静态，发在github page上，不会存资源到服务器上，可以放心使用。
 
 ## 🚀 功能特性
 
@@ -27,19 +26,7 @@ Mosaic-25 是一个驱9/25 宫格图片拆分与打包工具。它可以帮助�
    ```bash
    git clone [https://github.com/DreamMaker-stephen/Mosaic-25.git](https://github.com/DreamMaker-stephen/Mosaic-25.git)
    cd Mosaic-25
-安装依赖
 
-Bash  巴什
-npm install
-配置环境变量 在项目根目录下创建一个 .env.local 文件，并添加你的 API Key：
-
-Code snippet  代码片段
-VITE_GEMINI_API_KEY=你的_GEMINI_API_KEY
-启动开发服务器
-
-Bash  巴什
-npm run dev
-访问控制台输出的地址（通常是 http://localhost:5173）即可查看。
 
 📦 部署
 本项目支持通过 GitHub Actions 自动部署到 GitHub Pages。
