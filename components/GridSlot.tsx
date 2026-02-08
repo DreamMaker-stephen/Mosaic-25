@@ -43,7 +43,7 @@ const GridSlot: React.FC<GridSlotProps> = ({ item, index, onUpload, onRemove }) 
 
   return (
     <div
-      className={`relative group aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 
+      className={`relative group w-full h-full rounded-lg overflow-hidden border-2 transition-all duration-200
         ${item.previewUrl ? 'border-transparent' : 'border-dashed border-slate-600 hover:border-blue-500 hover:bg-slate-800 cursor-pointer'}
       `}
       onClick={handleClick}
@@ -63,7 +63,7 @@ const GridSlot: React.FC<GridSlotProps> = ({ item, index, onUpload, onRemove }) 
           <img
             src={item.previewUrl}
             alt={`Slot ${index + 1}`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
           {/* Overlay Actions */}
           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">

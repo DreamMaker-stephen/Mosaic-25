@@ -13,23 +13,38 @@ const SplitMode: React.FC<SplitModeProps> = ({ onUsed }) => {
   const [gridSize, setGridSize] = useState<GridSplitSize>(5);
   const [items, setItems] = useState<GridItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [imageRatio, setImageRatio] = useState<number>(1); // width / height
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
   const handleMainUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return;
-    
+
     const file = e.target.files[0];
     setIsProcessing(true);
-    
+
     try {
+      // 获取图片原始尺寸计算比例
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => {
+          const ratio = img.width / img.height;
+          setImageRatio(ratio);
+          URL.revokeObjectURL(objectUrl);
+          resolve();
+        };
+        img.onerror = reject;
+        img.src = objectUrl;
+      });
+
       const splitUrls = await splitImage(file, gridSize, gridSize);
-      
+
       const newItems: GridItem[] = splitUrls.map((url, i) => ({
         id: `split-${i}`,
         file: null, // We don't have the File object for generated splits, just URL
         previewUrl: url
       }));
-      
+
       setItems(newItems);
     } catch (err) {
       console.error(err);
@@ -119,6 +134,12 @@ const SplitMode: React.FC<SplitModeProps> = ({ onUsed }) => {
     gap: '4px',
   };
 
+  // Calculate container height based on image ratio
+  // Container width is max-w-[600px] minus padding (16px on each side = 32px)
+  // So content width is ~568px
+  const containerWidth = 568;
+  const containerHeight = Math.round(containerWidth / imageRatio);
+
   return (
     <div className="animate-in fade-in duration-500">
       {items.length === 0 ? (
@@ -174,8 +195,11 @@ const SplitMode: React.FC<SplitModeProps> = ({ onUsed }) => {
         // Result View
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 flex flex-col items-center">
-                 <div className="w-full max-w-[600px] aspect-square bg-slate-800 rounded-xl overflow-hidden shadow-2xl border border-slate-700 p-4">
-                    <div style={gridStyle} className="w-full h-full bg-slate-900">
+                 <div
+                    className="w-full max-w-[600px] bg-slate-800 rounded-xl overflow-hidden shadow-2xl border border-slate-700 p-4"
+                    style={{ height: containerHeight + 32 }} // 32px for padding
+                 >
+                    <div style={{...gridStyle, height: containerHeight}} className="w-full bg-slate-900">
                         {items.map((item, index) => (
                             <GridSlot
                                 key={item.id}
