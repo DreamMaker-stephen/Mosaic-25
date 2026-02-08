@@ -8,6 +8,8 @@ Mosaic-25 是一个9/25 宫格图片拆分与打包工具。它可以帮助用�
 
 可以访问www.zaomengshi.cn进行快速体验，
 页面是静态，发在github page上，不会存资源到服务器上，可以放心使用。
+https://dreammaker-stephen.github.io/Mosaic-25/
+
 
 ## 🚀 功能特性
 
